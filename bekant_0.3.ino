@@ -34,6 +34,8 @@ int max_distance = 300;
 NewPing sonar(trigger, echo, max_distance);
 
 // for bekant controlling:
+int PIN_up = 8;
+int PIN_down = 9;
 int timer_1to150 = 0;
 boolean changed = false;
 boolean upTo1 = false;
@@ -123,6 +125,7 @@ void showHeight() {
 }
 
 /*
+* Different Codes for each button because sometimes the remote-model is not detected correctly.
 * Change height of bekant-table controled by ir-remote:
 * Button UP: move table up
 * Button DOWN: move table down
@@ -142,42 +145,43 @@ void changeHeight() {
     downTo2 = false;
   }
   if (irrecv.decode(&results)) {
-    if (results.value == 0xFF906F) {
+    if (results.value == 0xFF906F || results.value == 0xe5cfbd7) {
       // UP:
-      digitalWrite(8, HIGH);
-      digitalWrite(9, LOW);
+      digitalWrite(PIN_up, HIGH);
+      digitalWrite(PIN_down, LOW);
       pressed = true;
-    } else if (results.value == 0xFFE01F) {
+    } else if (results.value == 0xFFE01F || results.value == 0xf076c13b) {
       // DOWN:
-      digitalWrite(8, LOW);
-      digitalWrite(9, HIGH);
+      digitalWrite(PIN_up, LOW);
+      digitalWrite(PIN_down, HIGH);
       pressed = true;
     } else  if (results.value == 0xFFFFFFFF) {
       // REPEAT:
       pressed = true;
-    } else if (results.value == 0xFFE21D) {
-       // STOP:
-       pressed = false;
-       upTo1 = false;
-       downTo2 = false;
-    } else if (results.value == 0xFF30CF) {
+    } else if (results.value == 0xFFE21D || results.value == 0xee886d7f) {
+      // STOP:
+      pressed = false;
+      upTo1 = false;
+      downTo2 = false;
+    } else if (results.value == 0xFF30CF || results.value == 0x9716be3f) {
       // 1:
       upTo1 = true;
-      digitalWrite(8, HIGH);
-      digitalWrite(9, LOW);
-    } else if (results.value == 0xFF18E7) {
+      downTo2 = false;
+      pressed = true;
+      digitalWrite(PIN_up, HIGH);
+      digitalWrite(PIN_down, LOW);
+    } else if (results.value == 0xFF18E7 || results.value == 0x3d9ae3f7) {
       // 2:
+      upTo1 = false;
       downTo2 = true;
-      digitalWrite(8, LOW);
-      digitalWrite(9, HIGH);
-    } else {
-      pressed = false;
+      pressed = true;
+      digitalWrite(PIN_up, LOW);
+      digitalWrite(PIN_down, HIGH);
     }
     irrecv.resume();
   }
   if (!pressed) {
-    // stop table if no ir-button is pressed:
-    digitalWrite(8, LOW);
-    digitalWrite(9, LOW);
+    digitalWrite(PIN_up, LOW);
+    digitalWrite(PIN_down, LOW);
   }
 }
