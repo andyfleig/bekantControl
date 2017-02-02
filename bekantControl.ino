@@ -108,8 +108,6 @@ void showHeight() {
   if (changed) {
     // "timer" needed for disabling lcd-background (it is just a counter which counts in ~150ms (because of the delay) steps)
     timer_1to150 = 0;
-    // enable lcd-background:
-    digitalWrite(backLight, LOW);
   } else {
     // "reset" timer from time to time to avoid overflow
     if (timer_1to150 > 200) {
@@ -118,7 +116,7 @@ void showHeight() {
       timer_1to150++;
     }
   }
-  if (timer_1to150 > 120) {
+  if (timer_1to150 > 100) {
     // disable lcd-background:
     digitalWrite(backLight, HIGH);
   }
@@ -145,6 +143,9 @@ void changeHeight() {
     downTo2 = false;
   }
   if (irrecv.decode(&results)) {
+    // enable lcd-background:
+    digitalWrite(backLight, LOW);
+    timer_1to150 = 0;
     if (results.value == 0xFF906F || results.value == 0xe5cfbd7) {
       // UP:
       digitalWrite(PIN_up, HIGH);
